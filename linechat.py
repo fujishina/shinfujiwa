@@ -10,15 +10,17 @@ Original file is located at
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, FollowEv\
+ent, FlexSendMessage
 import pya3rt
 import requests
+import json
 
 
 app = Flask(__name__)
 
 
-linebot_api=LineBotApi('buEmr3n5TauytWVl+ndjYNya9s7qH44zZh/VP4o3vRs21ZP4XaDmCJw\
+line_bot_api=LineBotApi('buEmr3n5TauytWVl+ndjYNya9s7qH44zZh/VP4o3vRs21ZP4XaDmCJw\
 RDHWhFlHAiAbnzt8N5zNU/PHF9U/XTkBibNkTUmtFGn2ovOzUikrvuhhWeClJ9chkCO0j5phKpxQXvM\
 FSuVA9JGTwhC/QrAdB04t89/1O/w1cDnyilFU=')
 handler=WebhookHandler('34bc19faead58d03c098814966ee0ed9')
@@ -35,26 +37,48 @@ def callback():
 
   return 'OK'
 
+@handler.add(FollowEvent)
+def handle_follow(event):
+    with open('./saisyohaguu_message.json') as f:
+        saisyohaguu_message = json.load(f)
+    line_bot_api.reply_message(
+        event.reply_token,
+        FlexSendMessage(alt_text='最初はぐー', contents=saisyohaguu_message)
+    )
+@handler.default()
+def default(event):
+    with open('./saisyohaguu_message.json') as f:
+        saisyohaguu_message = json.load(f)
+    line_bot_api.reply_message(
+        event.reply_token,
+        FlexSendMessage(alt_text='最初はぐー', contents=saisyohaguu_message)
+    )
+"""
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
   ai_message = talk_ai(event.message.text)
-  linebot_api.reply_message(event.reply_token, TextSendMessage(text=ai_message))
+  linebot_api.reply_message(event.reply_token, TextSendMessage(text=ai_message.text))
 
 def talk_ai(word):
   files = {
     'apikey': (None, 'DZZvp1v3nE7Pt3QSLQNISkcnn8kP9phH'),
     'query': (None, word.encode('utf-8')),
-  }
+    }
 
   response = requests.post('https://api.a3rt.recruit.co.jp/talk/v1/smalltalk',\
                            files=files)
-  print(response.json()['results'][0]['reply'])
+  data=response.json()['results'][0]['reply']
+  print(data)
 
+@handler.add(MessageEvent, message=TextMessage)
+def handle_text_message(event):
+    # メッセージでもテキストの場合はオウム返しする
+    linebot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=event.message.text)
+    )
+"""
 
 if __name__== '__main__':
   app.run()
 
-
-
-# Commented out IPython magic to ensure Python compatibility.
-# %cd/content/drive/'My Drive'/'linebot'
