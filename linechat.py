@@ -11,14 +11,14 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, FollowEv\
-ent, FlexSendMessage
+ent, FlexSendMessage, StickerSendMessage
 import pya3rt
 import requests
 import json
+import random
 
 
 app = Flask(__name__)
-
 
 line_bot_api=LineBotApi('buEmr3n5TauytWVl+ndjYNya9s7qH44zZh/VP4o3vRs21ZP4XaDmCJw\
 RDHWhFlHAiAbnzt8N5zNU/PHF9U/XTkBibNkTUmtFGn2ovOzUikrvuhhWeClJ9chkCO0j5phKpxQXvM\
@@ -53,11 +53,55 @@ def default(event):
         event.reply_token,
         FlexSendMessage(alt_text='最初はぐー', contents=saisyohaguu_message)
     )
+
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    request_message = event.message.text
+    bot_answer = random.choice(['ぐー', 'ちょき', 'ぱー'])
+    with open('./saisyohaguu_message.json') as f:
+        saisyohaguu_message = json.load(f)
+    with open('./aikode_message.json') as f:
+        aikode_message = json.load(f)
+    reply_messages = []
+    win_reply_message = [TextSendMessage(text='私の勝ちです')]
+    win_reply_message.append(StickerSendMessage(package_id='1', sticker_id=random.choice(['106', '407', '125', '100', '110'])))
+    win_reply_message.append(FlexSendMessage(alt_text='最初はぐー', contents=saisyohaguu_message))
+    lose_reply_message = [TextSendMessage(text='私の負けです')]
+    lose_reply_message.append(StickerSendMessage(package_id='2', sticker_id=random.choice(['152', '18', '25', '173', '524'])))
+    lose_reply_message.append(FlexSendMessage(alt_text='最初はぐー', contents=saisyohaguu_message))
+    draw_reply_message = [FlexSendMessage(alt_text='あいこで', contents=aikode_message)]
+    if request_message == 'ぐー':
+        reply_messages.append(TextSendMessage(text=bot_answer))
+        if bot_answer == 'ぐー':
+            reply_messages.extend(draw_reply_message)
+        elif bot_answer == 'ちょき':
+            reply_messages.extend(lose_reply_message)
+        elif bot_answer == 'ぱー':
+            reply_messages.extend(win_reply_message)
+    elif request_message == 'ちょき':
+        reply_messages.append(TextSendMessage(text=bot_answer))
+        if bot_answer == 'ぐー':
+            reply_messages.extend(win_reply_message)
+        elif bot_answer == 'ちょき':
+            reply_messages.extend(draw_reply_message)
+        elif bot_answer == 'ぱー':
+            reply_messages.extend(lose_reply_message)
+    elif request_message == 'ぱー':
+        reply_messages.append(TextSendMessage(text=bot_answer))
+        if bot_answer == 'ぐー':
+            reply_messages.extend(lose_reply_message)
+        elif bot_answer == 'ちょき':
+            reply_messages.extend(win_reply_message)
+        elif bot_answer == 'ぱー':
+            reply_messages.extend(draw_reply_message)
+    else:
+        reply_messages.append(FlexSendMessage(alt_text='最初はぐー', contents=saisyohaguu_message))
+    line_bot_api.reply_message(event.reply_token, reply_messages)
 """
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
   ai_message = talk_ai(event.message.text)
-  linebot_api.reply_message(event.reply_token, TextSendMessage(text=ai_message.text))
+  line_bot_api.reply_message(event.reply_token, TextSendMessage(text=ai_message.text))
 
 def talk_ai(word):
   files = {
@@ -73,7 +117,7 @@ def talk_ai(word):
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
     # メッセージでもテキストの場合はオウム返しする
-    linebot_api.reply_message(
+    line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=event.message.text)
     )
@@ -81,4 +125,3 @@ def handle_text_message(event):
 
 if __name__== '__main__':
   app.run()
-
