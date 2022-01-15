@@ -3,5 +3,4 @@ gunicorn
 line-bot-sdk
 pya3rt
 requests
-json
 random
