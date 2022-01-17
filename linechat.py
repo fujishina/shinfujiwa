@@ -25,7 +25,7 @@ def callback():
     abort(400)
 
   return 'OK'
-
+#友達追加時
 @handler.add(FollowEvent)
 def handle_follow(event):
     with open('./saisyohaguu_message.json') as f:
@@ -35,6 +35,7 @@ def handle_follow(event):
         FlexSendMessage(alt_text='最初はぐー', contents=saisyohaguu_message)
     )
 
+#設定されていない場合の返信
 @handler.default()
 def default(event):
     with open('./saisyohaguu_message.json') as f:
@@ -44,12 +45,14 @@ def default(event):
         StickerSendMessage(package_id='2', sticker_id=random.choice(['152', '18', '25', '173', '524']))
     )
 
-#メッセージを受信
+#メッセージを受信した場合
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-  kaiwa = event.message.text
-  if kaiwa == 'じゃんけん' or kaiwa == 'ぐー' or kaiwa == 'ちょき' or kaiwa == 'ぱー' or kaiwa == 'ジャンケン' or kaiwa == 'グー' or kaiwa == 'チョキ' or kaiwa == 'パー' :
-    request_message = event.message.text
+  request_message = event.message.text
+  if request_message == 'じゃんけん' or request_message == 'ぐー' or\
+   request_message == 'ちょき' or request_message == 'ぱー' or\
+    request_message == 'ジャンケン' or request_message == 'グー' or\
+    request_message == 'チョキ' or request_message == 'パー' :
     bot_answer = random.choice(['ぐー', 'ちょき', 'ぱー'])
     with open('./saisyohaguu_message.json') as f:
         saisyohaguu_message = json.load(f)
@@ -87,13 +90,12 @@ def handle_message(event):
             reply_messages.extend(draw_reply_message)
     elif request_message == 'じゃんけん' or request_message == 'ジャンケン':
         reply_messages.append(FlexSendMessage(alt_text='最初はぐー', contents=saisyohaguu_message))
-    else:
-        reply_messages(TextSendMessage(text=con_answer))
     line_bot_api.reply_message(event.reply_token, reply_messages)
   else:
       ai_message = talk_ai(event.message.text)
       line_bot_api.reply_message(event.reply_token, TextSendMessage(text=str(ai_message)))
 
+#AIメッセージ取得
 def talk_ai(word):
   files = {
     'apikey': (None, 'DZZvp1v3nE7Pt3QSLQNISkcnn8kP9phH'),
