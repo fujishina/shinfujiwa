@@ -48,7 +48,7 @@ def default(event):
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
   kaiwa = event.message.text
-  if kaiwa == 'じゃんけん' or kaiwa == 'ぐー' or kaiwa == 'ちょき' or kaiwa == 'ぱー' :
+  if kaiwa == 'じゃんけん' or kaiwa == 'ぐー' or kaiwa == 'ちょき' or kaiwa == 'ぱー' or kaiwa == 'ジャンケン' or kaiwa == 'グー' or kaiwa == 'チョキ' or kaiwa == 'パー' :
     request_message = event.message.text
     bot_answer = random.choice(['ぐー', 'ちょき', 'ぱー'])
     with open('./saisyohaguu_message.json') as f:
@@ -61,7 +61,7 @@ def handle_message(event):
     lose_reply_message = [TextSendMessage(text='私の負けです')]
     lose_reply_message.append(StickerSendMessage(package_id='2', sticker_id=random.choice(['152', '18', '25', '173', '524'])))
     draw_reply_message = [FlexSendMessage(alt_text='あいこで', contents=aikode_message)]
-    if request_message == 'ぐー':
+    if request_message == 'ぐー' or request_message == 'グー' :
         reply_messages.append(TextSendMessage(text=bot_answer))
         if bot_answer == 'ぐー':
             reply_messages.extend(draw_reply_message)
@@ -69,7 +69,7 @@ def handle_message(event):
             reply_messages.extend(lose_reply_message)
         elif bot_answer == 'ぱー':
             reply_messages.extend(win_reply_message)
-    elif request_message == 'ちょき':
+    elif request_message == 'ちょき' or request_message == 'チョキ' :
         reply_messages.append(TextSendMessage(text=bot_answer))
         if bot_answer == 'ぐー':
             reply_messages.extend(win_reply_message)
@@ -77,7 +77,7 @@ def handle_message(event):
             reply_messages.extend(draw_reply_message)
         elif bot_answer == 'ぱー':
             reply_messages.extend(lose_reply_message)
-    elif request_message == 'ぱー':
+    elif request_message == 'ぱー' or request_message == 'パー' :
         reply_messages.append(TextSendMessage(text=bot_answer))
         if bot_answer == 'ぐー':
             reply_messages.extend(lose_reply_message)
@@ -85,10 +85,10 @@ def handle_message(event):
             reply_messages.extend(win_reply_message)
         elif bot_answer == 'ぱー':
             reply_messages.extend(draw_reply_message)
-    elif request_message == 'じゃんけん':
+    elif request_message == 'じゃんけん' or request_message == 'ジャンケン':
         reply_messages.append(FlexSendMessage(alt_text='最初はぐー', contents=saisyohaguu_message))
     else:
-        reply_messages(TextSendMessage(text='終わり'))
+        reply_messages(TextSendMessage(text=con_answer))
     line_bot_api.reply_message(event.reply_token, reply_messages)
   else:
       ai_message = talk_ai(event.message.text)
