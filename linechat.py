@@ -92,7 +92,7 @@ def handle_message(event):
     line_bot_api.reply_message(event.reply_token, reply_messages)
   else:
       ai_message = talk_ai(event.message.text)
-      linebot_api.reply_message(event.reply_token, TextSendMessage(text=str(ai_message)))
+      line_bot_api.reply_message(event.reply_token, TextSendMessage(text=str(ai_message)))
 
 def talk_ai(word):
   files = {
