@@ -58,10 +58,8 @@ def handle_message(event):
     reply_messages = []
     win_reply_message = [TextSendMessage(text='私の勝ちです')]
     win_reply_message.append(StickerSendMessage(package_id='1', sticker_id=random.choice(['106', '407', '125', '100', '110'])))
-    win_reply_message.append(FlexSendMessage(alt_text='最初はぐー', contents=saisyohaguu_message))
     lose_reply_message = [TextSendMessage(text='私の負けです')]
     lose_reply_message.append(StickerSendMessage(package_id='2', sticker_id=random.choice(['152', '18', '25', '173', '524'])))
-    lose_reply_message.append(FlexSendMessage(alt_text='最初はぐー', contents=saisyohaguu_message))
     draw_reply_message = [FlexSendMessage(alt_text='あいこで', contents=aikode_message)]
     if request_message == 'ぐー':
         reply_messages.append(TextSendMessage(text=bot_answer))
@@ -87,8 +85,10 @@ def handle_message(event):
             reply_messages.extend(win_reply_message)
         elif bot_answer == 'ぱー':
             reply_messages.extend(draw_reply_message)
-    else:
+    elif request_message == 'じゃんけん':
         reply_messages.append(FlexSendMessage(alt_text='最初はぐー', contents=saisyohaguu_message))
+    else:
+        reply_messages(TextSendMessage(text='終わり'))
     line_bot_api.reply_message(event.reply_token, reply_messages)
   else:
       ai_message = talk_ai(event.message.text)
