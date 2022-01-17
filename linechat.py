@@ -5,6 +5,7 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage, FollowEve
 import pya3rt
 import requests
 import json
+import datetime
 import random
 
 app = Flask(__name__)
@@ -45,6 +46,7 @@ def default(event):
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    dt_now = datetime.datetime.now()
     request_message = event.message.text
     bot_answer = random.choice(['ぐー', 'ちょき', 'ぱー'])
     with open('./saisyohaguu_message.json') as f:
@@ -52,7 +54,7 @@ def handle_message(event):
     with open('./aikode_message.json') as f:
         aikode_message = json.load(f)
     reply_messages = []
-    win_reply_message = [TextSendMessage(text='私の勝ちです')]
+    win_reply_message = [TextSendMessage(text='私の勝ちです'+str(dt_now.minute)+'分')]
     win_reply_message.append(StickerSendMessage(package_id='1', sticker_id=random.choice(['106', '407', '125', '100', '110'])))
     win_reply_message.append(FlexSendMessage(alt_text='最初はぐー', contents=saisyohaguu_message))
     lose_reply_message = [TextSendMessage(text='私の負けです')]
